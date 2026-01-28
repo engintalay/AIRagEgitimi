@@ -9,6 +9,12 @@ This project fine-tunes a TinyLlama-1.1B model on a synthetic dataset ("Planet Z
 - `requirements.txt`: Python dependencies.
 
 ## Usage
-1. `pip install -r requirements.txt`
-2. `python3 train.py`
-3. `python3 inference.py`
+1. **Create and activate a virtual environment**:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   # Windows: venv\\Scripts\\activate
+   ```
+2. `pip install -r requirements.txt`
+3. `python3 train.py`
+4. `python3 inference.py`
