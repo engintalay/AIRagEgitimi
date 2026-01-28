@@ -1,5 +1,3 @@
-
-import os
 import torch
 from datasets import load_dataset
 from transformers import (
@@ -7,9 +5,10 @@ from transformers import (
     AutoTokenizer,
     BitsAndBytesConfig,
     TrainingArguments,
+    Trainer,
+    DataCollatorForLanguageModeling,
 )
-from peft import LoraConfig
-from trl import SFTTrainer
+from peft import LoraConfig, get_peft_model
 
 # Configuration
 model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
@@ -21,7 +20,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
 
-# QLoRA Config for 4GB VRAM optimization
+# QLoRA Config
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
@@ -33,7 +32,7 @@ bnb_config = BitsAndBytesConfig(
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
     quantization_config=bnb_config,
-    device_map="auto" # Will likely map to cuda:0
+    device_map="auto"
 )
 
 model.config.use_cache = False
@@ -48,8 +47,22 @@ peft_config = LoraConfig(
     task_type="CAUSAL_LM",
 )
 
-# Load Dataset
+# Apply LoRA
+model = get_peft_model(model, peft_config)
+
+# Load and tokenize dataset
 dataset = load_dataset('json', data_files=dataset_path, split="train")
+
+def tokenize_function(examples):
+    return tokenizer(examples["text"], truncation=True, padding=True, max_length=512)
+
+tokenized_dataset = dataset.map(tokenize_function, batched=True)
+
+# Data collator
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer=tokenizer,
+    mlm=False,
+)
 
 # Training Arguments
 training_arguments = TrainingArguments(
@@ -59,16 +72,14 @@ training_arguments = TrainingArguments(
     learning_rate=2e-4,
     logging_steps=5,
     save_steps=50,
-    remove_unused_columns=False,
 )
 
 # Trainer
-trainer = SFTTrainer(
+trainer = Trainer(
     model=model,
-    train_dataset=dataset,
-    peft_config=peft_config,
     args=training_arguments,
-    formatting_func=lambda x: x["text"],
+    train_dataset=tokenized_dataset,
+    data_collator=data_collator,
 )
 
 # Train
@@ -77,6 +88,6 @@ trainer.train()
 
 # Save Model
 print(f"Saving model to {new_model}...")
-trainer.model.save_pretrained(new_model)
-trainer.tokenizer.save_pretrained(new_model)
+model.save_pretrained(new_model)
+tokenizer.save_pretrained(new_model)
 print("Done!")
