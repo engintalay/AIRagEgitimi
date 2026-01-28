@@ -13,6 +13,7 @@ model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 fine_tuned_path = "tinyllama-zyrgon-7"
 
 questions = [
+    "What do Azura and Crimson represent?",
     "What is the primary light source of Planet Zyrgon-7?",
     "Describe the 'Crystal Whales' of Zyrgon-7.",
     "What is the content of Plasma Stew?",
