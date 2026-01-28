@@ -12,8 +12,8 @@ from peft import LoraConfig, get_peft_model
 
 # Configuration
 model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-new_model = "tinyllama-zyrgon-7"
-dataset_path = "data/zyrgon_system.jsonl"
+new_model = "tinyllama-zyrgon-7-extended"
+dataset_path = "data/zyrgon_extended.jsonl"
 
 # Tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
@@ -67,9 +67,9 @@ data_collator = DataCollatorForLanguageModeling(
 # Training Arguments
 training_arguments = TrainingArguments(
     output_dir="./results",
-    num_train_epochs=1,
+    num_train_epochs=5,  # Daha fazla epoch
     per_device_train_batch_size=1,
-    learning_rate=2e-4,
+    learning_rate=5e-4,  # Daha yüksek learning rate
     logging_steps=5,
     save_steps=50,
 )
