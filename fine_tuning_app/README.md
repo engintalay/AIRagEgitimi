@@ -39,5 +39,6 @@ This project fine-tunes a TinyLlama-1.1B model on a synthetic dataset ("Planet Z
 ## Key Features
 - **QLoRA**: 4-bit quantization for memory efficiency
 - **LoRA**: Low-rank adaptation for parameter-efficient fine-tuning
+- **RAG**: Retrieval-Augmented Generation using FAISS and SentenceTransformers
 - **Synthetic Dataset**: Custom "Planet Zyrgon-7" knowledge base
 - **Comparison**: Side-by-side base vs fine-tuned model testing

@@ -6,3 +6,5 @@ bitsandbytes
 accelerate
 scipy
 datasets
+sentence-transformers
+faiss-cpu
